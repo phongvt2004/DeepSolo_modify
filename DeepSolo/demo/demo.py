@@ -90,7 +90,30 @@ if __name__ == "__main__":
                     path, len(predictions["instances"]), time.time() - start_time
                 )
             )
-
+            poly = np.asarray(predictions.bd)
+            poly_bbox= []
+            for itr in poly:
+                _x = itr[::2]
+                _y = itr[1::2]
+                poly_bbox.append([_x,_y])
+            bbox = []
+            for itr in poly_bbox:
+                x_min = min(itr[0])
+                x_max = max(itr[0])
+                y_min = min(itr[1])
+                y_max = max(itr[1])
+                bbox.append([x_min,y_min,x_max,y_max])
+            pil_img = Image.fromarray(img)
+            img_draw = ImageDraw.Draw(pil_img)
+            text = []
+            for box in bbox:
+                img_draw.rectangle(box,outline = 'red')
+                cropped_img = pil_img.crop(box)
+                img_transformed = img_transform(cropped_img).unsqueeze(0)
+                logits = parseq(img_transformed)
+                pred = logits.softmax(-1)
+                label, confidence = parseq.tokenizer.decode(pred)
+                text.append(label[0])
             if args.output:
                 if os.path.isdir(args.output):
                     assert os.path.isdir(args.output), args.output
