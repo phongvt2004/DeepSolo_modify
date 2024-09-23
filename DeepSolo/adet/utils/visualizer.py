@@ -65,6 +65,8 @@ class TextVisualizer(Visualizer):
             color = random.choice(colors)
 
             # draw polygons
+            print(rec)
+            print(bd)
             if bd is not None:
                 bd = np.hsplit(bd, 2)
                 bd = np.vstack([bd[0], bd[1][::-1]])
@@ -74,6 +76,7 @@ class TextVisualizer(Visualizer):
             line = self._process_ctrl_pnt(ctrl_pnt)
             line_ = LineString(line)
             center_point = np.array(line_.interpolate(0.5, normalized=True).coords[0], dtype=np.int32)
+            break
             # self.draw_line(
             #     line[:, 0],
             #     line[:, 1],
