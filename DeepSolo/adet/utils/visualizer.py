@@ -70,6 +70,7 @@ class TextVisualizer(Visualizer):
             if bd is not None:
                 bd = np.hsplit(bd, 2)
                 bd = np.vstack([bd[0], bd[1][::-1]])
+                print(bd)
                 self.draw_polygon(bd, color, alpha=alpha)
 
             # draw center lines
