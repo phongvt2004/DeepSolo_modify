@@ -96,12 +96,12 @@ if __name__ == "__main__":
             for bd in bds:
                 bd = np.hsplit(bd, 2)
                 bd = np.vstack([bd[0], bd[1][::-1]])
-                _x = bd[::2]
-                _y = bd[1::2]
+                bd = np.hsplit(bd, 2)
+                _x = bd[0]
+                _y = bd[1]
                 bds_bbox.append([_x,_y])
-                print(bd)
-                print(bd[::2])
-                print(bd[1::2])
+                print(_x)
+                print(_y)
                 break
             bbox = []
             for itr in bds_bbox:
