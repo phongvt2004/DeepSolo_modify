@@ -101,6 +101,7 @@ class VisualizationDemo(object):
         bases = bases[0].squeeze()
         bases = (bases / 8).tanh().cpu().numpy()
         num_bases = len(bases)
+        print(bases)
         fig, axes = plt.subplots(nrows=num_bases // 2, ncols=2)
         for i, basis in enumerate(bases):
             basis = (basis + 1) / 2
