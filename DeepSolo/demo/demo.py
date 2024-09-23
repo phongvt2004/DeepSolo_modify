@@ -6,7 +6,7 @@ import os
 import time
 import cv2
 import tqdm
-
+from PIL import Image
 from detectron2.data.detection_utils import read_image
 from detectron2.utils.logger import setup_logger
 
@@ -104,16 +104,10 @@ if __name__ == "__main__":
                 y_max = max(itr[1])
                 bbox.append([x_min,y_min,x_max,y_max])
             pil_img = Image.fromarray(img)
-            img_draw = ImageDraw.Draw(pil_img)
             text = []
-            for box in bbox:
-                img_draw.rectangle(box,outline = 'red')
+            for i, box in enumerate(bbox):
                 cropped_img = pil_img.crop(box)
-                img_transformed = img_transform(cropped_img).unsqueeze(0)
-                logits = parseq(img_transformed)
-                pred = logits.softmax(-1)
-                label, confidence = parseq.tokenizer.decode(pred)
-                text.append(label[0])
+                cropped_img.save(f"/kaggle/working/crop_{i}.jpg")
             if args.output:
                 if os.path.isdir(args.output):
                     assert os.path.isdir(args.output), args.output
