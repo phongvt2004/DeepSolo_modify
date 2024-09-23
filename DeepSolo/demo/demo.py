@@ -99,11 +99,12 @@ if __name__ == "__main__":
                 _x = bd[::2]
                 _y = bd[1::2]
                 bds_bbox.append([_x,_y])
+                print(bd)
                 print(bd[::2])
                 print(bd[1::2])
                 break
             bbox = []
-            for itr in poly_bbox:
+            for itr in bds_bbox:
                 x_min = min(itr[0])
                 x_max = max(itr[0])
                 y_min = min(itr[1])
