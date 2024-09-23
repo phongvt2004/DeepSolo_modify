@@ -91,12 +91,15 @@ if __name__ == "__main__":
                 )
             )
             instances = predictions["instances"].to(demo.cpu_device)
-            poly = np.asarray(instances.bd)
-            poly_bbox= []
-            for itr in poly:
-                _x = itr[::2]
-                _y = itr[1::2]
-                poly_bbox.append([_x,_y])
+            bds = np.asarray(instances.bd)
+            bds = np.hsplit(bds, 2)
+            bds = np.vstack([bds[0], bds[1][::-1]])
+            bds_bbox= []
+            for bd in bds:
+                
+                _x = bd[0]
+                _y = bd[1]
+                bds_bbox.append([_x,_y])
             bbox = []
             for itr in poly_bbox:
                 x_min = min(itr[0])
