@@ -97,8 +97,8 @@ if __name__ == "__main__":
                 bd = np.hsplit(bd, 2)
                 bd = np.vstack([bd[0], bd[1][::-1]])
                 bd = np.hsplit(bd, 2)
-                _x = bd[0]
-                _y = bd[1]
+                _x = bd[0].reshape(-1)
+                _y = bd[1].reshape(-1)
                 bds_bbox.append([_x,_y])
                 print(_x)
                 print(_y)
