@@ -9,7 +9,7 @@ import tqdm
 from PIL import Image
 from detectron2.data.detection_utils import read_image
 from detectron2.utils.logger import setup_logger
-
+import numpy as np
 from predictor import VisualizationDemo
 from adet.config import get_cfg
 
