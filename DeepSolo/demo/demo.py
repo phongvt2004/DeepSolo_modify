@@ -90,8 +90,8 @@ if __name__ == "__main__":
                     path, len(predictions["instances"]), time.time() - start_time
                 )
             )
-            predictions = predictions.to(demo.cpu_device)
-            poly = np.asarray(predictions["instances"].bd)
+            instances = predictions["instances"].to(demo.cpu_device)
+            poly = np.asarray(instances.bd)
             poly_bbox= []
             for itr in poly:
                 _x = itr[::2]
