@@ -100,9 +100,6 @@ if __name__ == "__main__":
                 _x = bd[0].reshape(-1)
                 _y = bd[1].reshape(-1)
                 bds_bbox.append([_x,_y])
-                print(_x)
-                print(_y)
-                break
             bbox = []
             for itr in bds_bbox:
                 x_min = min(itr[0])
@@ -114,7 +111,7 @@ if __name__ == "__main__":
             text = []
             for i, box in enumerate(bbox):
                 cropped_img = pil_img.crop(box)
-                cropped_img.save(f"/kaggle/working/crop_{i}.jpg")
+                cropped_img.save(f"/kaggle/working/test/crop_{i}.jpg")
             if args.output:
                 if os.path.isdir(args.output):
                     assert os.path.isdir(args.output), args.output
