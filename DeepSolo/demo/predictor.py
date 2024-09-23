@@ -264,7 +264,6 @@ class AsyncPredictor:
 class ViTAEPredictor:
     def __init__(self, cfg):
         self.cfg = cfg.clone()
-        print(self.cfg)
         self.model = build_model(self.cfg)
         self.model.eval()
         if len(cfg.DATASETS.TEST):

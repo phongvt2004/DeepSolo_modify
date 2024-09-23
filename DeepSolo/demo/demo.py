@@ -92,14 +92,14 @@ if __name__ == "__main__":
             )
             instances = predictions["instances"].to(demo.cpu_device)
             bds = np.asarray(instances.bd)
-            bds = np.hsplit(bds, 2)
-            bds = np.vstack([bds[0], bds[1][::-1]])
             bds_bbox= []
             for bd in bds:
-                
-                _x = bd[0]
-                _y = bd[1]
+                bd = np.hsplit(bd, 2)
+                bd = np.vstack([bd[0], bd[1][::-1]])
                 bds_bbox.append([_x,_y])
+                print(bd[::2])
+                print(bd[1::2])
+                break
             bbox = []
             for itr in poly_bbox:
                 x_min = min(itr[0])
