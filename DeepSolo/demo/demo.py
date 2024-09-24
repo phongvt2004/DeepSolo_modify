@@ -65,6 +65,7 @@ def get_parser():
 
 def get_all_keyframes(root_dir):
     keyframes_dir_list = [f'{root_dir}/{x}/Keyframes' for x in os.listdir(root_dir)]
+    keyframes_dir_list.remove(f'{root_dir}/deepsoo/Keyframes')
     all_keyframe_paths = dict()
     for keyframe_dir in keyframes_dir_list:
         for part in sorted(os.listdir(keyframe_dir)):
