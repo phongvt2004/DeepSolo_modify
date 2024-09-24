@@ -81,6 +81,7 @@ def get_all_keyframes(root_dir):
                 for video_id, video_dir in zip(video_ids, video_dirs):
                     keyframe_paths = sorted(glob.glob(f'{data_part_path}/{video_dir}/*.jpg'))
                     all_keyframe_paths[data_part][video_id] = keyframe_paths
+    return all_keyframe_paths
 
 if __name__ == "__main__":
     mp.set_start_method("spawn", force=True)
