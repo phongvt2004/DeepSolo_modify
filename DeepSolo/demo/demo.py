@@ -83,7 +83,7 @@ def get_all_keyframes(root_dir):
     return all_keyframe_paths
 
 if __name__ == "__main__":
-    BATCH_SIZE = 8
+    BATCH_SIZE = 4
     mp.set_start_method("spawn", force=True)
     args = get_parser().parse_args()
     logger = setup_logger()

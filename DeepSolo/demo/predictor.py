@@ -201,14 +201,14 @@ class AsyncPredictor:
             super().__init__()
 
         def run(self):
-            predictor = DefaultPredictor(self.cfg)
+            predictor = ViTAEPredictor(self.cfg)
 
             while True:
                 task = self.task_queue.get()
                 if isinstance(task, AsyncPredictor._StopToken):
                     break
                 idx, data = task
-                result = predictor(data)
+                result = predictor.batch_detect(data)
                 self.result_queue.put((idx, result))
 
     def __init__(self, cfg, num_gpus: int = 1):
