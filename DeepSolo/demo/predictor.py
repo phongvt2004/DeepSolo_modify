@@ -87,6 +87,19 @@ class VisualizationDemo(object):
                 vis_output = visualizer.draw_instance_predictions(predictions=instances)
 
         return predictions, vis_output
+    
+    def run_on_batch_image(self, images):
+        """
+        Args:
+            image (np.ndarray): an image of shape (H, W, C) (in BGR order).
+                This is the format used by OpenCV.
+
+        Returns:
+            predictions (dict): the output of the model.
+            vis_output (VisImage): the visualized image output.
+        """
+        predictions = self.predictor.batch_detect(images)
+        return predictions, None
 
     def _frame_from_video(self, video):
         while video.isOpened():
@@ -300,4 +313,25 @@ class ViTAEPredictor:
             image = torch.as_tensor(image.astype("float32").transpose(2, 0, 1))
             inputs = {"image": image, "height": height, "width": width}
             predictions = self.model([inputs])[0]
+            return predictions
+    
+    def batch_detect(self, original_images):
+        """
+        Args:
+            original_image (np.ndarray): an image of shape (H, W, C) (in BGR order).
+
+        Returns:
+            predictions (dict):
+                the output of the model for one image only.
+                See :doc:`/tutorials/models` for details about the format.
+        """
+        with torch.no_grad():  # https://github.com/sphinx-doc/sphinx/issues/4258
+            inputs = []
+            for original_image in original_images:
+                height, width = original_image.shape[:2]
+                image = self.aug.get_transform(original_image).apply_image(original_image)
+                image = self.pad.get_transform(image).apply_image(image)
+                image = torch.as_tensor(image.astype("float32").transpose(2, 0, 1))
+                inputs.append({"image": image, "height": height, "width": width})
+            predictions = self.model(inputs)
             return predictions

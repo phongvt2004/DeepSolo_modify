@@ -5,14 +5,14 @@ import multiprocessing as mp
 import os
 import time
 import cv2
-import tqdm
+from tqdm import tqdm
 from PIL import Image
 from detectron2.data.detection_utils import read_image
 from detectron2.utils.logger import setup_logger
 import numpy as np
 from predictor import VisualizationDemo
 from adet.config import get_cfg
-
+import pandas as pd
 # constants
 WINDOW_NAME = "COCO detections"
 
@@ -63,6 +63,22 @@ def get_parser():
     )
     return parser
 
+def get_all_keyframes(root_dir):
+    keyframes_dir_list = [f'{root_dir}/{x}/Keyframes' for x in os.listdir(root_dir)]
+    all_keyframe_paths = dict()
+    for keyframe_dir in keyframes_dir_list:
+        for part in sorted(os.listdir(keyframe_dir)):
+            data_part = part.split('_')[-2] # L01, L02 for ex
+            all_keyframe_paths[data_part] =  dict()
+    for keyframe_dir in keyframes_dir_list:
+        for data_part in sorted(all_keyframe_paths.keys()):
+            data_part_path = f'{keyframe_dir}/{data_part}_extra'
+            if os.path.isdir(data_part_path):
+                video_dirs = sorted(os.listdir(data_part_path))
+                video_ids = [video_dir.split('_')[-1] for video_dir in video_dirs]
+                for video_id, video_dir in zip(video_ids, video_dirs):
+                    keyframe_paths = sorted(glob.glob(f'{data_part_path}/{video_dir}/*.jpg'))
+                    all_keyframe_paths[data_part][video_id] = keyframe_paths
 
 if __name__ == "__main__":
     mp.set_start_method("spawn", force=True)
@@ -73,50 +89,52 @@ if __name__ == "__main__":
     cfg = setup_cfg(args)
 
     demo = VisualizationDemo(cfg)
-
+    if not os.path.exists(args.output):
+        os.mkdir(args.output)
     if args.input:
-        if os.path.isdir(args.input[0]):
-            args.input = [os.path.join(args.input[0], fname) for fname in os.listdir(args.input[0])]
-        elif len(args.input) == 1:
-            args.input = glob.glob(os.path.expanduser(args.input[0]))
-            assert args.input, "The input path(s) was not found"
-        for path in tqdm.tqdm(args.input, disable=not args.output):
-            # use PIL, to be consistent with evaluation
-            img = read_image(path, format="BGR")
-            start_time = time.time()
-            predictions, visualized_output = demo.run_on_image(img)
-            logger.info(
-                "{}: detected {} instances in {:.2f}s".format(
-                    path, len(predictions["instances"]), time.time() - start_time
-                )
-            )
-            instances = predictions["instances"].to(demo.cpu_device)
-            bds = np.asarray(instances.bd)
-            bds_bbox= []
-            for bd in bds:
-                bd = np.hsplit(bd, 2)
-                bd = np.vstack([bd[0], bd[1][::-1]])
-                bd = np.hsplit(bd, 2)
-                _x = bd[0].reshape(-1)
-                _y = bd[1].reshape(-1)
-                bds_bbox.append([_x,_y])
-            bbox = []
-            for itr in bds_bbox:
-                x_min = min(itr[0])
-                x_max = max(itr[0])
-                y_min = min(itr[1])
-                y_max = max(itr[1])
-                bbox.append([x_min,y_min,x_max,y_max])
-            pil_img = Image.fromarray(img)
-            text = []
-            for i, box in enumerate(bbox):
-                cropped_img = pil_img.crop(box)
-                cropped_img.save(f"/kaggle/working/test/crop_{i}.jpg")
-            if args.output:
-                if os.path.isdir(args.output):
-                    assert os.path.isdir(args.output), args.output
-                    out_filename = os.path.join(args.output, os.path.basename(path))
-                else:
-                    assert len(args.input) == 1, "Please specify a directory with args.output"
-                    out_filename = args.output
-                visualized_output.save(out_filename)
+        all_keyframe_paths = get_all_keyframes_paths(args.input)
+        for key, video_keyframe_paths in tqdm(all_keyframe_paths.items()):
+            video_ids = sorted(video_keyframe_paths.keys())
+            if not os.path.exists(os.path.join(args.output, key)):
+                os.mkdir(os.path.join(args.output, key))
+            for video_id in tqdm(video_ids):
+                video_keyframe_path = video_keyframe_paths[video_id]
+                for i in tqdm(range(0, len(video_keyframe_path), bs)):
+                    image_paths = video_keyframe_path[i:i+bs]
+                    # use PIL, to be consistent with evaluation
+                    img = read_image(path, format="RGB")
+                    predictions, _ = demo.run_on_batch_image(img)
+                    for prediction in predictions:
+                        instances = prediction["instances"].to(demo.cpu_device)
+                        bds = np.asarray(instances.bd)
+                        bds_bbox= []
+                        for bd in bds:
+                            bd = np.hsplit(bd, 2)
+                            bd = np.vstack([bd[0], bd[1][::-1]])
+                            bd = np.hsplit(bd, 2)
+                            _x = bd[0].reshape(-1)
+                            _y = bd[1].reshape(-1)
+                            bds_bbox.append([_x,_y])
+                        bbox = []
+                        for itr in bds_bbox:
+                            x_min = min(itr[0])
+                            x_max = max(itr[0])
+                            y_min = min(itr[1])
+                            y_max = max(itr[1])
+                            bbox.append([x_min,y_min,x_max,y_max])
+                        pil_img = Image.fromarray(img)
+                        text = []
+                        
+                        for i, box in enumerate(bbox):
+                            cropped_img = pil_img.crop(box)
+                            if args.output:
+                                if os.path.isdir(args.output):
+                                    
+                                    frame_id, ext = os.path.basename(args.output).split('.')
+                                    basename = f"{i}.{ext}"
+                                    out_filename = os.path.join(args.output, frame_id, basename)
+                                    if not os.path.exists(os.path.join(args.output, frame_id)):
+                                        os.mkdir(os.path.join(args.output, frame_id))
+                                    cropped_img.save(out_filename)
+                                else:
+                                    raise "Please specify a directory with args.output"
