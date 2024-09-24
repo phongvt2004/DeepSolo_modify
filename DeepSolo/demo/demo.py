@@ -103,6 +103,8 @@ if __name__ == "__main__":
                 os.mkdir(os.path.join(args.output, key))
             for video_id in tqdm(video_ids):
                 video_keyframe_path = video_keyframe_paths[video_id]
+                if not os.path.exists(os.path.join(args.output, key, video_id)):
+                    os.mkdir(os.path.join(args.output, key, video_id))
                 for i in tqdm(range(0, len(video_keyframe_path), bs)):
                     image_paths = video_keyframe_path[i:i+bs]
                     # use PIL, to be consistent with evaluation
@@ -135,9 +137,9 @@ if __name__ == "__main__":
                                 if os.path.isdir(args.output):
                                     frame_id, ext = os.path.basename(image_paths[j]).split('.')
                                     basename = f"{i}.{ext}"
-                                    out_filename = os.path.join(args.output, video_id, frame_id, basename)
-                                    if not os.path.exists(os.path.join(args.output, video_id, frame_id)):
-                                        os.mkdir(os.path.join(args.output, video_id, frame_id))
+                                    out_filename = os.path.join(args.output, key, video_id, frame_id, basename)
+                                    if not os.path.exists(os.path.join(args.output, key, video_id, frame_id)):
+                                        os.mkdir(os.path.join(args.output, key, video_id, frame_id))
                                     cropped_img.save(out_filename)
                                 else:
                                     raise "Please specify a directory with args.output"
