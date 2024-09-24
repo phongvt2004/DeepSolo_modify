@@ -107,7 +107,7 @@ if __name__ == "__main__":
                     image_paths = video_keyframe_path[i:i+bs]
                     # use PIL, to be consistent with evaluation
                     images = [read_image(path, format="BGR") for path in image_paths]
-                    predictions, _ = demo.run_on_batch_image(img)
+                    predictions, _ = demo.run_on_batch_image(images)
                     for prediction in predictions:
                         instances = predictions["instances"].to(demo.cpu_device)
                         bds = np.asarray(instances.bd)
