@@ -43,7 +43,6 @@ def get_parser():
     parser.add_argument("--webcam", action="store_true", help="Take inputs from webcam.")
     parser.add_argument("--video-input", help="Path to video file.")
     parser.add_argument("--input", help="input image or directory")
-    parser.add_argument("--batch", type=int, default=128, help="input image or directory")
     parser.add_argument(
         "--output",
         help="A file or directory to save output visualizations. "
@@ -84,6 +83,7 @@ def get_all_keyframes(root_dir):
     return all_keyframe_paths
 
 if __name__ == "__main__":
+    BATCH_SIZE = 64
     mp.set_start_method("spawn", force=True)
     args = get_parser().parse_args()
     logger = setup_logger()
@@ -95,7 +95,7 @@ if __name__ == "__main__":
     if not os.path.exists(args.output):
         os.mkdir(args.output)
     if args.input:
-        bs = args.batch
+        bs = BATCH_SIZE
         all_keyframe_paths = get_all_keyframes(args.input)
         for key, video_keyframe_paths in tqdm(all_keyframe_paths.items()):
             video_ids = sorted(video_keyframe_paths.keys())
