@@ -5,7 +5,7 @@ import multiprocessing as mp
 import os
 import time
 import cv2
-from tqdm.notebook import tqdm
+from tqdm import tqdm
 from PIL import Image
 from detectron2.data.detection_utils import read_image
 from detectron2.utils.logger import setup_logger

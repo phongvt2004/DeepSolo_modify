@@ -22,7 +22,7 @@ from adet.data.augmentation import Pad
 
 
 class VisualizationDemo(object):
-    def __init__(self, cfg, instance_mode=ColorMode.IMAGE, parallel=False):
+    def __init__(self, cfg, instance_mode=ColorMode.IMAGE, parallel=True):
         """
         Args:
             cfg (CfgNode):
@@ -238,9 +238,9 @@ class AsyncPredictor:
             p.start()
         atexit.register(self.shutdown)
 
-    def put(self, image):
+    def put(self, images):
         self.put_idx += 1
-        self.task_queue.put((self.put_idx, image))
+        self.task_queue.put((self.put_idx, images))
 
     def get(self):
         self.get_idx += 1  # the index needed for this request
@@ -261,8 +261,8 @@ class AsyncPredictor:
     def __len__(self):
         return self.put_idx - self.get_idx
 
-    def __call__(self, image):
-        self.put(image)
+    def __call__(self, images):
+        self.put(images)
         return self.get()
 
     def shutdown(self):
