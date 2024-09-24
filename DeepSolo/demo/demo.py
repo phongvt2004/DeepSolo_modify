@@ -92,7 +92,7 @@ if __name__ == "__main__":
     if not os.path.exists(args.output):
         os.mkdir(args.output)
     if args.input:
-        all_keyframe_paths = get_all_keyframes_paths(args.input)
+        all_keyframe_paths = get_all_keyframes(args.input)
         for key, video_keyframe_paths in tqdm(all_keyframe_paths.items()):
             video_ids = sorted(video_keyframe_paths.keys())
             if not os.path.exists(os.path.join(args.output, key)):
