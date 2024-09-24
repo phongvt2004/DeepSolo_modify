@@ -94,6 +94,7 @@ if __name__ == "__main__":
     if not os.path.exists(args.output):
         os.mkdir(args.output)
     if args.input:
+        bs = args.batch
         all_keyframe_paths = get_all_keyframes(args.input)
         for key, video_keyframe_paths in tqdm(all_keyframe_paths.items()):
             video_ids = sorted(video_keyframe_paths.keys())
