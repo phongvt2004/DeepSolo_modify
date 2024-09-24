@@ -109,7 +109,7 @@ if __name__ == "__main__":
                     images = [read_image(path, format="BGR") for path in image_paths]
                     predictions, _ = demo.run_on_batch_image(images)
                     for prediction in predictions:
-                        instances = predictions["instances"].to(demo.cpu_device)
+                        instances = prediction["instances"].to(demo.cpu_device)
                         bds = np.asarray(instances.bd)
                         bds_bbox= []
                         for bd in bds:
