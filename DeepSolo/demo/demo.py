@@ -143,3 +143,4 @@ if __name__ == "__main__":
                                     cropped_img.save(out_filename)
                                 else:
                                     raise "Please specify a directory with args.output"
+                    del predictions
