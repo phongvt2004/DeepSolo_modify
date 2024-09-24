@@ -92,57 +92,48 @@ if __name__ == "__main__":
     if not os.path.exists(args.output):
         os.mkdir(args.output)
     if args.input:
-        # all_keyframe_paths = get_all_keyframes_paths(args.input)
-        # for key, video_keyframe_paths in tqdm(all_keyframe_paths.items()):
-        #     video_ids = sorted(video_keyframe_paths.keys())
-        #     if not os.path.exists(os.path.join(args.output, key)):
-        #         os.mkdir(os.path.join(args.output, key))
-        #     for video_id in tqdm(video_ids):
-        #         video_keyframe_path = video_keyframe_paths[video_id]
-        #         for i in tqdm(range(0, len(video_keyframe_path), bs)):
-        #             image_paths = video_keyframe_path[i:i+bs]
+        all_keyframe_paths = get_all_keyframes_paths(args.input)
+        for key, video_keyframe_paths in tqdm(all_keyframe_paths.items()):
+            video_ids = sorted(video_keyframe_paths.keys())
+            if not os.path.exists(os.path.join(args.output, key)):
+                os.mkdir(os.path.join(args.output, key))
+            for video_id in tqdm(video_ids):
+                video_keyframe_path = video_keyframe_paths[video_id]
+                for i in tqdm(range(0, len(video_keyframe_path), bs)):
+                    image_paths = video_keyframe_path[i:i+bs]
                     # use PIL, to be consistent with evaluation
-        path = args.input
-        img = read_image(path, format="BGR")
-        start_time = time.time()
-        predictions, _ = demo.run_on_image(img)
-        logger.info(
-            "{}: detected {} instances in {:.2f}s".format(
-                path, len(predictions["instances"]), time.time() - start_time
-            )
-        )
-        # for prediction in predictions:
-        print(predictions["instances"])
-        instances = predictions["instances"].to(demo.cpu_device)
-        bds = np.asarray(instances.bd)
-        bds_bbox= []
-        for bd in bds:
-            bd = np.hsplit(bd, 2)
-            bd = np.vstack([bd[0], bd[1][::-1]])
-            bd = np.hsplit(bd, 2)
-            _x = bd[0].reshape(-1)
-            _y = bd[1].reshape(-1)
-            bds_bbox.append([_x,_y])
-        bbox = []
-        for itr in bds_bbox:
-            x_min = min(itr[0])
-            x_max = max(itr[0])
-            y_min = min(itr[1])
-            y_max = max(itr[1])
-            bbox.append([x_min,y_min,x_max,y_max])
-        pil_img = Image.fromarray(img)
-        text = []
-        
-        for i, box in enumerate(bbox):
-            cropped_img = pil_img.crop(box)
-            if args.output:
-                if os.path.isdir(args.output):
-                    
-                    frame_id, ext = os.path.basename(args.output).split('.')
-                    basename = f"{i}.{ext}"
-                    out_filename = os.path.join(args.output, frame_id, basename)
-                    if not os.path.exists(os.path.join(args.output, frame_id)):
-                        os.mkdir(os.path.join(args.output, frame_id))
-                    cropped_img.save(out_filename)
-                else:
-                    raise "Please specify a directory with args.output"
+                    images = [read_image(path, format="BGR") for path in image_paths]
+                    predictions, _ = demo.run_on_batch_image(img)
+                    for prediction in predictions:
+                        instances = predictions["instances"].to(demo.cpu_device)
+                        bds = np.asarray(instances.bd)
+                        bds_bbox= []
+                        for bd in bds:
+                            bd = np.hsplit(bd, 2)
+                            bd = np.vstack([bd[0], bd[1][::-1]])
+                            bd = np.hsplit(bd, 2)
+                            _x = bd[0].reshape(-1)
+                            _y = bd[1].reshape(-1)
+                            bds_bbox.append([_x,_y])
+                        bbox = []
+                        for itr in bds_bbox:
+                            x_min = min(itr[0])
+                            x_max = max(itr[0])
+                            y_min = min(itr[1])
+                            y_max = max(itr[1])
+                            bbox.append([x_min,y_min,x_max,y_max])
+                        pil_img = Image.fromarray(img)
+                        text = []
+                        
+                        for i, box in enumerate(bbox):
+                            cropped_img = pil_img.crop(box)
+                            if args.output:
+                                if os.path.isdir(args.output):
+                                    frame_id, ext = os.path.basename(path).split('.')
+                                    basename = f"{i}.{ext}"
+                                    out_filename = os.path.join(args.output, video_id, frame_id, basename)
+                                    if not os.path.exists(os.path.join(args.output, video_id, frame_id)):
+                                        os.mkdir(os.path.join(args.output, video_id, frame_id))
+                                    cropped_img.save(out_filename)
+                                else:
+                                    raise "Please specify a directory with args.output"

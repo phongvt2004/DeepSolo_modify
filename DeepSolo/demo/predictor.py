@@ -328,6 +328,8 @@ class ViTAEPredictor:
         with torch.no_grad():  # https://github.com/sphinx-doc/sphinx/issues/4258
             inputs = []
             for original_image in original_images:
+                if self.input_format == "RGB":
+                    original_image = original_image[:, :, ::-1]
                 height, width = original_image.shape[:2]
                 image = self.aug.get_transform(original_image).apply_image(original_image)
                 image = self.pad.get_transform(image).apply_image(image)
