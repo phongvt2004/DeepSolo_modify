@@ -133,7 +133,7 @@ if __name__ == "__main__":
                             cropped_img = pil_img.crop(box)
                             if args.output:
                                 if os.path.isdir(args.output):
-                                    frame_id, ext = os.path.basename(path).split('.')
+                                    frame_id, ext = os.path.basename(image_paths[j]).split('.')
                                     basename = f"{i}.{ext}"
                                     out_filename = os.path.join(args.output, video_id, frame_id, basename)
                                     if not os.path.exists(os.path.join(args.output, video_id, frame_id)):
