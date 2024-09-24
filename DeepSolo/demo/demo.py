@@ -104,7 +104,13 @@ if __name__ == "__main__":
                     # use PIL, to be consistent with evaluation
         path = args.input
         img = read_image(path, format="RGB")
+        start_time = time.time()
         predictions, _ = demo.run_on_batch_image([img])
+        logger.info(
+            "{}: detected {} instances in {:.2f}s".format(
+                path, len(predictions["instances"]), time.time() - start_time
+            )
+        )
         for prediction in predictions:
             instances = prediction["instances"].to(demo.cpu_device)
             bds = np.asarray(instances.bd)
