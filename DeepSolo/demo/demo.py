@@ -103,9 +103,9 @@ if __name__ == "__main__":
         #             image_paths = video_keyframe_path[i:i+bs]
                     # use PIL, to be consistent with evaluation
         path = args.input
-        img = read_image(path, format="RGB")
+        img = read_image(path, format="BGR")
         start_time = time.time()
-        predictions, _ = demo.run_on_batch_image([img])
+        predictions, _ = demo.run_on_image(img)
         logger.info(
             "{}: detected {} instances in {:.2f}s".format(
                 path, len(predictions[0]["instances"]), time.time() - start_time
