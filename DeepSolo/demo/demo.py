@@ -113,7 +113,7 @@ if __name__ == "__main__":
         )
         # for prediction in predictions:
         print(predictions["instances"])
-        instances = prediction["instances"].to(demo.cpu_device)
+        instances = predictions["instances"].to(demo.cpu_device)
         bds = np.asarray(instances.bd)
         bds_bbox= []
         for bd in bds:
