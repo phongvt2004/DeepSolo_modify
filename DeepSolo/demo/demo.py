@@ -108,7 +108,7 @@ if __name__ == "__main__":
                     # use PIL, to be consistent with evaluation
                     images = [read_image(path, format="BGR") for path in image_paths]
                     predictions, _ = demo.run_on_batch_image(images)
-                    for prediction in predictions:
+                    for j, prediction in enumerate(predictions):
                         instances = prediction["instances"].to(demo.cpu_device)
                         bds = np.asarray(instances.bd)
                         bds_bbox= []
@@ -126,7 +126,7 @@ if __name__ == "__main__":
                             y_min = min(itr[1])
                             y_max = max(itr[1])
                             bbox.append([x_min,y_min,x_max,y_max])
-                        pil_img = Image.fromarray(img)
+                        pil_img = Image.fromarray(images[j])
                         text = []
                         
                         for i, box in enumerate(bbox):
