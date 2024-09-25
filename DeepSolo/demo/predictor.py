@@ -22,7 +22,7 @@ from adet.data.augmentation import Pad
 
 
 class VisualizationDemo(object):
-    def __init__(self, cfg, instance_mode=ColorMode.IMAGE, parallel=True):
+    def __init__(self, cfg, instance_mode=ColorMode.IMAGE, parallel=False):
         """
         Args:
             cfg (CfgNode):
